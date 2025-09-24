@@ -1,109 +1,41 @@
-const { useState, useRef } = React;
+const { useState } = React;
 
-const LivestreamHomepage = () => {
-    const [isStreaming, setIsStreaming] = useState(false);
-    const [error, setError] = useState(null);
-    const videoRef = useRef(null);
-    const streamRef = useRef(null);
+function HomePage(){
+    const [message, setMessage] = useState('');
 
-    const startStream = async () => {
-        try {
-            setError(null);
-            
-            // Request access to user's webcam
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    facingMode: 'user'
-                },
-                audio: true
-            });
-            
-            // Store stream reference for cleanup
-            streamRef.current = stream;
-            
-            // Set video source
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.play();
-            }
-            
-            setIsStreaming(true);
-            
-        } catch (err) {
-            console.error('Error accessing webcam:', err);
-            setError(
-                err.name === 'NotAllowedError' 
-                    ? 'Camera access denied. Please allow camera access and try again.'
-                    : err.name === 'NotFoundError'
-                    ? 'No camera found. Please connect a camera and try again.'
-                    : 'Unable to access camera. Please check your camera and try again.'
-            );
-        }
-    };
-
-    const stopStream = () => {
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-        }
-        
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-        }
-        
-        setIsStreaming(false);
-        setError(null);
-    };
-
-    const toggleCamera = async () => {
-        if (isStreaming) {
-            stopStream();
+    const goToSeller = () => {
+        // If seller exposes a mount function, call it to render seller UI
+        if (window.mountSeller && typeof window.mountSeller === 'function') {
+            window.mountSeller();
         } else {
-            await startStream();
+            // fallback: navigate to seller.js directly (will reload the page)
+            window.location.href = 'seller.js';
+        }
+    };
+
+    const goToBuying = () => {
+        if (window.mountBuyer && typeof window.mountBuyer === 'function') {
+            window.mountBuyer();
+        } else {
+            // fallback: navigate to seller.js directly (will reload the page)
+            window.location.href = 'buyer.js';
         }
     };
 
     return (
-        <div className="container">
-            <h1 className="logo">Livestream Marketing</h1>
-            <p className="tagline">Connect with your audience in real-time</p>
-            
-            <button 
-                className="stream-button" 
-                onClick={toggleCamera}
-            >
-                {isStreaming ? 'Stop Stream' : 'Stream'}
-            </button>
-            
-            {error && (
-                <div className="error">
-                    {error}
-                </div>
-            )}
-            
-            <div className={`video-container ${isStreaming ? 'active' : ''}`}>
-                <video 
-                    ref={videoRef}
-                    autoPlay 
-                    muted 
-                    playsInline
-                />
-                {isStreaming && (
-                    <div className="controls">
-                        <button className="control-btn" onClick={stopStream}>
-                            Stop Stream
-                        </button>
-                        <button className="control-btn" onClick={() => window.alert('Stream settings coming soon!')}>
-                            Settings
-                        </button>
-                    </div>
-                )}
+        <div className="home-container">
+            <h1 className="logo">Livestream Thrifting</h1>
+            <p className="tagline">Choose an option to continue</p>
+
+            <div className="button-row">
+                <button className="primary-btn" onClick={goToBuying}>Buying</button>
+                <button className="secondary-btn" onClick={goToSeller}>Selling</button>
             </div>
+
+            {message && <div className="info">{message}</div>}
         </div>
     );
-};
+}
 
-// Render the component
-ReactDOM.render(<LivestreamHomepage />, document.getElementById('root'));
+// Render the home page
+ReactDOM.render(<HomePage />, document.getElementById('root'));
