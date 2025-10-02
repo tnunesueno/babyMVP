@@ -1,0 +1,16 @@
+{
+  "name": "thrift-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.17.1",
+  "scripts": {
+    "db:up": "docker start thrift-pg || docker run --name thrift-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=thrift_dev -p 5432:5432 -d postgres:16"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "prisma": "^6.16.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.3"
+  }
+}
