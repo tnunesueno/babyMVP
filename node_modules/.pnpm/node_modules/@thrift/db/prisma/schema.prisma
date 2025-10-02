@@ -76,7 +76,6 @@ model Auction {
   item          Item  @relation(fields: [itemId], references: [id])
   seller        User  @relation("AuctionSeller", fields: [sellerId], references: [id])
   currentBidder User? @relation("CurrentBidder", fields: [currentBidderId], references: [id])
-  currentBidder User? @relation(fields: [currentBidderId], references: [id])
   bids          Bid[]
   events        BidEventLog[]
   payments      Payment[]
